@@ -1,0 +1,16 @@
+{
+    "id": "387cd6c4-f7e2-4b8c-a944-948b37b34700",
+    "version": "0.0.1",
+    "requiredApiVersion": "^1.19.0",
+    "iconFile": "icon.png",
+    "author": {
+        "name": "Duda Nogueira",
+        "homepage": "http://dudanogueira.com.br",
+        "support": "http://dudanogueira.com.br"
+    },
+    "name": "Chuck Norris",
+    "nameSlug": "chuck-norris",
+    "classFile": "ChuckNorrisApp.ts",
+    "description": "An App for https://chucknorris.io/",
+    "implements": []
+}
