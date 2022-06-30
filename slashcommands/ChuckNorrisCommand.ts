@@ -55,7 +55,7 @@ export class ChuckNorrisCommand implements ISlashCommand {
                     categories.data.forEach(element => {
                         elements.push(
                             block.newButtonElement({
-                                actionId: "ChuckNorrisSelect",
+                                actionId: "ChuckNorrisCategorySelect",
                                 text: block.newPlainTextObject(element),
                                 value: element,
                                 style: ButtonStyle.PRIMARY,
@@ -82,20 +82,20 @@ export class ChuckNorrisCommand implements ISlashCommand {
                 case 'search':
                     const term = params.join(" ");
                     // initiate contextual bar
-                    const contextualbarBlocks = SearchContextualBlocks(modify, term);
-                    await modify.getUiController().openContextualBarView(contextualbarBlocks, { triggerId }, user);
 
-                    const response = await http.get(
+                    const result = await http.get(
                         "https://api.chucknorris.io/jokes/search?query=" + term
                     )
-                    if (response.data.result.length > 0) {
-                        // get random
-                        // TODO: add modal to select joke
-                        const message = response.data.result[Math.floor(Math.random() * response.data.result.length)]["value"];
-                        await this.sendMessage(context, modify, message); // [3]    
-                    } else {
-                        await this.sendMessage(context, modify, `No Jokes found for term ${term} :(`); // [3]
-                    }
+                    // if (response.data.result.length > 0) {
+                    //     // get random
+                    //     // TODO: add modal to select joke
+                    //     const message = response.data.result[Math.floor(Math.random() * response.data.result.length)]["value"];
+                    //     await this.sendMessage(context, modify, message); // [3]    
+                    // } else {
+                    //     await this.sendMessage(context, modify, `No Jokes found for term ${term} :(`); // [3]
+                    // }
+                    const contextualbarBlocks = SearchContextualBlocks(modify, term, result);
+                    await modify.getUiController().openContextualBarView(contextualbarBlocks, { triggerId }, user);
                     break;
 
                 default: // [7]

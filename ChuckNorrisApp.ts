@@ -10,8 +10,9 @@ import {
 } from '@rocket.chat/apps-engine/definition/accessors';
 import { App } from '@rocket.chat/apps-engine/definition/App';
 import { IAppInfo } from '@rocket.chat/apps-engine/definition/metadata';
-import { UIKitBlockInteractionContext } from '@rocket.chat/apps-engine/definition/uikit';
+import { ISectionBlock, IUIKitResponse, UIKitBlockInteractionContext, UIKitViewSubmitInteractionContext } from '@rocket.chat/apps-engine/definition/uikit';
 import { ChuckNorrisCommand } from './slashcommands/ChuckNorrisCommand';
+import { SearchContextualBlocks } from './ui/Blocks';
 
 export class ChuckNorrisApp extends App {
     public appLogger: ILogger
@@ -37,28 +38,28 @@ export class ChuckNorrisApp extends App {
         modify: IModify
     ) {
         const data = context.getInteractionData();
-
+        const { room } = context.getInteractionData();
         const { actionId } = data;
 
         switch (actionId) {
-            case "ChuckNorrisSelect": {
+            case "ChuckNorrisCategorySelect": {
                 try {
-                    const  ChuckNorrisResponse  = await http.get(
+                    const ChuckNorrisResponse = await http.get(
                         `https://api.chucknorris.io/jokes/random?category=${data.value}`
                     );
 
-                    const { room } = context.getInteractionData();
 
-                    const memeSender = await modify
+
+                    const jokeSender = await modify
                         .getCreator()
                         .startMessage()
                         .setText(ChuckNorrisResponse.data["value"])
 
                     if (room) {
-                        memeSender.setRoom(room);
+                        jokeSender.setRoom(room);
                     }
 
-                    await modify.getCreator().finish(memeSender);
+                    await modify.getCreator().finish(jokeSender);
 
                     return {
                         success: true,
@@ -70,10 +71,49 @@ export class ChuckNorrisApp extends App {
                     };
                 }
             }
+
+            case "ChuckNorrisSearchSelect": {
+
+                try {
+
+                    const jokeSender = await modify
+                        .getCreator()
+                        .startMessage()
+                        .setText(`${data.value}`)
+
+                    if (room) {
+                        jokeSender.setRoom(room);
+                    }
+                    await modify.getCreator().finish(jokeSender);
+                    return {
+                        success: true,
+                    };
+                } catch (err) {
+                    console.error(err);
+                    return {
+                        success: false,
+                    };
+                }
+
+            }
         }
 
         return {
             success: false,
         };
+    }
+
+    public async executeViewSubmitHandler(context: UIKitViewSubmitInteractionContext, modify:IModify, http:IHttp): Promise<IUIKitResponse> {
+        const { user, view, triggerId } = context.getInteractionData();
+
+        const newterm = view.state?.["searchInput"]?.["searchInput"]
+        console.log("TODO: search again for new term: ", newterm)
+        const result = await http.get(
+            "https://api.chucknorris.io/jokes/search?query=" + newterm
+        )
+        // TODO: ContextualBLock Not reopening
+        const contextualbarBlocks = SearchContextualBlocks(modify, newterm, result);
+        await modify.getUiController().updateContextualBarView(contextualbarBlocks, { triggerId }, user);
+        return context.getInteractionResponder().successResponse();
     }    
 }
