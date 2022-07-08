@@ -48,8 +48,6 @@ export class ChuckNorrisApp extends App {
                         `https://api.chucknorris.io/jokes/random?category=${data.value}`
                     );
 
-
-
                     const jokeSender = await modify
                         .getCreator()
                         .startMessage()
@@ -96,6 +94,12 @@ export class ChuckNorrisApp extends App {
                 }
 
             }
+
+            case "ChuckNorrisSearchNew":{
+                const data = context.getInteractionData();
+                console.log("AQUI! ", data)
+                console.log("AQUI! ", context)
+            }
         }
 
         return {
@@ -113,7 +117,12 @@ export class ChuckNorrisApp extends App {
         )
         // TODO: ContextualBLock Not reopening
         const contextualbarBlocks = SearchContextualBlocks(modify, newterm, result);
-        await modify.getUiController().updateContextualBarView(contextualbarBlocks, { triggerId }, user);
-        return context.getInteractionResponder().successResponse();
+        //await modify.getUiController().updateContextualBarView(contextualbarBlocks, { triggerId }, user);
+        await modify.getUiController().openContextualBarView(contextualbarBlocks, { triggerId }, user);
+        return {
+            success: false,
+        };
     }    
+
+
 }

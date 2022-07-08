@@ -50,8 +50,8 @@ export class ChuckNorrisCommand implements ISlashCommand {
                     const categories = await http.get(
                         "https://api.chucknorris.io/jokes/categories"
                     )
-                    
-                    const elements : any[] = [];
+
+                    const elements: any[] = [];
                     categories.data.forEach(element => {
                         elements.push(
                             block.newButtonElement({
@@ -67,7 +67,7 @@ export class ChuckNorrisCommand implements ISlashCommand {
                         blockId: "subreddits",
                         elements: elements
                     });
-               
+
                     builder.setBlocks(block);
                     // Notifier not applicable to LiveChat Rooms
                     if (room.type !== "l") {
@@ -80,22 +80,37 @@ export class ChuckNorrisCommand implements ISlashCommand {
                     break;
 
                 case 'search':
-                    const term = params.join(" ");
-                    // initiate contextual bar
+                    var term = '';
+                    var result = null;
+                    if (params.length) {
+                        const term = params.join(" ");
+                        // initiate contextual bar
 
-                    const result = await http.get(
-                        "https://api.chucknorris.io/jokes/search?query=" + term
-                    )
-                    // if (response.data.result.length > 0) {
-                    //     // get random
-                    //     // TODO: add modal to select joke
-                    //     const message = response.data.result[Math.floor(Math.random() * response.data.result.length)]["value"];
-                    //     await this.sendMessage(context, modify, message); // [3]    
-                    // } else {
-                    //     await this.sendMessage(context, modify, `No Jokes found for term ${term} :(`); // [3]
-                    // }
-                    const contextualbarBlocks = SearchContextualBlocks(modify, term, result);
-                    await modify.getUiController().openContextualBarView(contextualbarBlocks, { triggerId }, user);
+                        const result = await http.get(
+                            "https://api.chucknorris.io/jokes/search?query=" + term
+                        )
+                        // if (response.data.result.length > 0) {
+                        //     // get random
+                        //     // TODO: add modal to select joke
+                        //     const message = response.data.result[Math.floor(Math.random() * response.data.result.length)]["value"];
+                        //     await this.sendMessage(context, modify, message); // [3]    
+                        // } else {
+                        //     await this.sendMessage(context, modify, `No Jokes found for term ${term} :(`); // [3]
+                        // }
+                        var contextualbarBlocks = SearchContextualBlocks(modify, term, result);
+                        await modify.getUiController().openContextualBarView(contextualbarBlocks, { triggerId }, user);
+                    } else {
+                        //var contextualbarBlocks = SearchContextualBlocks(modify, term);
+                        // no search term, warn user
+                        block.addSectionBlock({
+                            text: block.newMarkdownTextObject("No term to search. try: `/chucknorris search Rocket`"),
+                        })
+                        const builder = await modify.getCreator().startMessage().setRoom(room);
+                        builder.setBlocks(block);
+                        await modify
+                            .getNotifier()
+                            .notifyUser(user, builder.getMessage());
+                    }
                     break;
 
                 default: // [7]
