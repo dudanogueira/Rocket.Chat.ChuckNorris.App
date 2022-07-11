@@ -13,7 +13,7 @@ import { IAppInfo } from '@rocket.chat/apps-engine/definition/metadata';
 import { ISectionBlock, IUIKitResponse, UIKitBlockInteractionContext, UIKitViewSubmitInteractionContext } from '@rocket.chat/apps-engine/definition/uikit';
 import { ChuckNorrisCommand } from './slashcommands/ChuckNorrisCommand';
 import { SearchContextualBlocks } from './ui/Blocks';
-
+import { settings } from './config/Settings';
 export class ChuckNorrisApp extends App {
     public appLogger: ILogger
     constructor(info: IAppInfo, logger: ILogger, accessors: IAppAccessors) {
@@ -27,7 +27,8 @@ export class ChuckNorrisApp extends App {
     }
 
     public async extendConfiguration(configuration: IConfigurationExtend) {
-        configuration.slashCommands.provideSlashCommand(new ChuckNorrisCommand()); // [2]
+        configuration.slashCommands.provideSlashCommand(new ChuckNorrisCommand());
+        await Promise.all(settings.map((setting) => configuration.settings.provideSetting(setting)));
     }
 
     public async executeBlockActionHandler(
@@ -95,7 +96,7 @@ export class ChuckNorrisApp extends App {
 
             }
 
-            case "ChuckNorrisSearchNew":{
+            case "ChuckNorrisSearchNew": {
                 const data = context.getInteractionData();
                 console.log("AQUI! ", data)
                 console.log("AQUI! ", context)
@@ -107,7 +108,7 @@ export class ChuckNorrisApp extends App {
         };
     }
 
-    public async executeViewSubmitHandler(context: UIKitViewSubmitInteractionContext, modify:IModify, http:IHttp): Promise<IUIKitResponse> {
+    public async executeViewSubmitHandler(context: UIKitViewSubmitInteractionContext, modify: IModify, http: IHttp): Promise<IUIKitResponse> {
         const { user, view, triggerId } = context.getInteractionData();
 
         const newterm = view.state?.["searchInput"]?.["searchInput"]
@@ -122,7 +123,7 @@ export class ChuckNorrisApp extends App {
         return {
             success: false,
         };
-    }    
+    }
 
 
 }

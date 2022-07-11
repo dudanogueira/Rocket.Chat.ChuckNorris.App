@@ -1,4 +1,6 @@
 {
     "ChuckNorris_Description": "Get some Chuck Norris joke. Type `/chucknorris` for a random joke or `/chucknorris categories` to choose a category",
-    "ChuckNorris_Params": "categories, search"
+    "ChuckNorris_Params": "categories, search",
+    "ChuckNorris_Removeexplicit": "Remove explicit jokes"
+
 }

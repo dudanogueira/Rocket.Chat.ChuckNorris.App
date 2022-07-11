@@ -10,7 +10,7 @@ import {
 import { SearchContextualBlocks } from '../ui/Blocks';
 import { ButtonStyle } from "@rocket.chat/apps-engine/definition/uikit";
 import { shuffle } from "utils";
-
+import { AppSetting } from '../config/Settings';
 export class ChuckNorrisCommand implements ISlashCommand {
     public command = 'chucknorris'; // [1]
     public i18nParamsExample = 'ChuckNorris_Params';
@@ -23,6 +23,8 @@ export class ChuckNorrisCommand implements ISlashCommand {
         const user = context.getSender()
         const room = context.getRoom()
         const block = modify.getCreator().getBlockBuilder();
+        // remove explicit jokes
+        const { value: removeExplicitJokes } = await read.getEnvironmentReader().getSettings().getById(AppSetting.ChuckNorrisAppRemoveExplicit);
         // get the subcommand and the params
         const [subcommand, ...params] = context.getArguments();
         // no subcommand, send a random joke
@@ -50,6 +52,12 @@ export class ChuckNorrisCommand implements ISlashCommand {
                     const categories = await http.get(
                         "https://api.chucknorris.io/jokes/categories"
                     )
+                    if (removeExplicitJokes) {
+                        var index = categories.data.indexOf("explicit");
+                        if (index !== -1) {
+                            categories.data.splice(index, 1);
+                        }
+                    }
 
                     const elements: any[] = [];
                     categories.data.forEach(element => {
