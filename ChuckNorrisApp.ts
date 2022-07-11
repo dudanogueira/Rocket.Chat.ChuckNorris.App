@@ -13,7 +13,7 @@ import { IAppInfo } from '@rocket.chat/apps-engine/definition/metadata';
 import { ISectionBlock, IUIKitResponse, UIKitBlockInteractionContext, UIKitViewSubmitInteractionContext } from '@rocket.chat/apps-engine/definition/uikit';
 import { ChuckNorrisCommand } from './slashcommands/ChuckNorrisCommand';
 import { SearchContextualBlocks } from './ui/Blocks';
-import { settings } from './config/Settings';
+import { AppSetting, settings } from './config/Settings';
 export class ChuckNorrisApp extends App {
     public appLogger: ILogger
     constructor(info: IAppInfo, logger: ILogger, accessors: IAppAccessors) {
@@ -41,12 +41,13 @@ export class ChuckNorrisApp extends App {
         const data = context.getInteractionData();
         const { room } = context.getInteractionData();
         const { actionId } = data;
+        const { value: ChuckNorrisUrl } = await read.getEnvironmentReader().getSettings().getById(AppSetting.ChuckNorrisAppUrl);
 
         switch (actionId) {
             case "ChuckNorrisCategorySelect": {
                 try {
                     const ChuckNorrisResponse = await http.get(
-                        `https://api.chucknorris.io/jokes/random?category=${data.value}`
+                        `${ChuckNorrisUrl}/jokes/random?category=${data.value}`
                     );
 
                     const jokeSender = await modify

@@ -25,12 +25,13 @@ export class ChuckNorrisCommand implements ISlashCommand {
         const block = modify.getCreator().getBlockBuilder();
         // remove explicit jokes
         const { value: removeExplicitJokes } = await read.getEnvironmentReader().getSettings().getById(AppSetting.ChuckNorrisAppRemoveExplicit);
+        const { value: ChuckNorrisUrl } = await read.getEnvironmentReader().getSettings().getById(AppSetting.ChuckNorrisAppUrl);
         // get the subcommand and the params
         const [subcommand, ...params] = context.getArguments();
         // no subcommand, send a random joke
         if (!subcommand) {
             const response = await http.get(
-                "https://api.chucknorris.io/jokes/random"
+                ChuckNorrisUrl + "/jokes/random"
             )
             const message = response.data["value"];
             const ReturnJoke = modify
@@ -50,7 +51,7 @@ export class ChuckNorrisCommand implements ISlashCommand {
                     });
                     // get categories
                     const categories = await http.get(
-                        "https://api.chucknorris.io/jokes/categories"
+                        ChuckNorrisUrl + "/jokes/categories"
                     )
                     if (removeExplicitJokes) {
                         var index = categories.data.indexOf("explicit");
@@ -95,7 +96,7 @@ export class ChuckNorrisCommand implements ISlashCommand {
                         // initiate contextual bar
 
                         const result = await http.get(
-                            "https://api.chucknorris.io/jokes/search?query=" + term
+                            ChuckNorrisUrl +  "/jokes/search?query=" + term
                         )
                         
                         // if (response.data.result.length > 0) {
