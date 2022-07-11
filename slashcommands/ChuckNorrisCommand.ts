@@ -97,6 +97,7 @@ export class ChuckNorrisCommand implements ISlashCommand {
                         const result = await http.get(
                             "https://api.chucknorris.io/jokes/search?query=" + term
                         )
+                        
                         // if (response.data.result.length > 0) {
                         //     // get random
                         //     // TODO: add modal to select joke
@@ -105,7 +106,7 @@ export class ChuckNorrisCommand implements ISlashCommand {
                         // } else {
                         //     await this.sendMessage(context, modify, `No Jokes found for term ${term} :(`); // [3]
                         // }
-                        var contextualbarBlocks = SearchContextualBlocks(modify, term, result);
+                        var contextualbarBlocks = SearchContextualBlocks(modify, term, result, removeExplicitJokes);
                         await modify.getUiController().openContextualBarView(contextualbarBlocks, { triggerId }, user);
                     } else {
                         //var contextualbarBlocks = SearchContextualBlocks(modify, term);

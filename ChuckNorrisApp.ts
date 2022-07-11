@@ -108,22 +108,5 @@ export class ChuckNorrisApp extends App {
         };
     }
 
-    public async executeViewSubmitHandler(context: UIKitViewSubmitInteractionContext, modify: IModify, http: IHttp): Promise<IUIKitResponse> {
-        const { user, view, triggerId } = context.getInteractionData();
-
-        const newterm = view.state?.["searchInput"]?.["searchInput"]
-        console.log("TODO: search again for new term: ", newterm)
-        const result = await http.get(
-            "https://api.chucknorris.io/jokes/search?query=" + newterm
-        )
-        // TODO: ContextualBLock Not reopening
-        const contextualbarBlocks = SearchContextualBlocks(modify, newterm, result);
-        //await modify.getUiController().updateContextualBarView(contextualbarBlocks, { triggerId }, user);
-        await modify.getUiController().openContextualBarView(contextualbarBlocks, { triggerId }, user);
-        return {
-            success: false,
-        };
-    }
-
 
 }

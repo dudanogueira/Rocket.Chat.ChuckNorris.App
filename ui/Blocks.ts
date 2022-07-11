@@ -4,11 +4,12 @@ import { IUIKitContextualBarViewParam } from '@rocket.chat/apps-engine/definitio
 import {
     IHttpResponse,
     IModify,
+    IRead,
 } from '@rocket.chat/apps-engine/definition/accessors';
+import { AppSetting } from '../config/Settings';
 
-export function SearchContextualBlocks(modify: IModify, term: string, result?: IHttpResponse): IUIKitContextualBarViewParam {
+export function SearchContextualBlocks(modify: IModify, term: string, result?: IHttpResponse, removeExplicitJokes?:boolean): IUIKitContextualBarViewParam {
     const blocks = modify.getCreator().getBlockBuilder();
-
 
     // blocks.addInputBlock({
     //     blockId: "searchInput",
@@ -44,16 +45,20 @@ export function SearchContextualBlocks(modify: IModify, term: string, result?: I
     //     },
     // });
     
+    if(removeExplicitJokes){
+        var jokes = result?.data.result.filter(j => !j.categories.includes("explicit"))
+    }else{
+        var jokes = result?.data.result;
+    }
 
 
-
-    if (result?.data.total == 0) {
+    if (jokes.length == 0) {
         blocks.addSectionBlock({
             text: blocks.newMarkdownTextObject(`No Joke found. Try a new search`),
         })
     } else {
         if (term){
-            var showing_message = `Showing *${result?.data.total}* jokes for term _${term}_`
+            var showing_message = `Showing *${jokes.length }* jokes for term _${term}_`
         }else{
             var showing_message = 'Search for a term'
         }
@@ -63,7 +68,7 @@ export function SearchContextualBlocks(modify: IModify, term: string, result?: I
         blocks.addDividerBlock();
     }
 
-    result?.data.result.forEach(element => {
+    jokes.forEach(element => {
 
         blocks.addSectionBlock({
             text: blocks.newPlainTextObject(element["value"]),
